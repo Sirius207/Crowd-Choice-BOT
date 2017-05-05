@@ -7,7 +7,7 @@ from flask import Flask, request, send_file
 from fsm import TocMachine
 
 API_TOKEN = '286227588:AAF-vT00dFv59r1-pxViYuNh3ubGV6TTE2A'
-WEBHOOK_URL = 'https://hidden-plains-84407.herokuapp.com/'
+WEBHOOK_URL = 'https://hidden-plains-84407.herokuapp.com/hook'
 
 app = Flask(__name__)
 bot = telegram.Bot(token=API_TOKEN)
