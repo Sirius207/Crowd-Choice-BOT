@@ -184,6 +184,12 @@ class TocMachine(GraphMachine):
 
     def is_going_to_state1(self, update):
         print ('check state1')
+        coin = get_user_coin_by_id(get_chat_id(update))
+        if coin - 5 < 0:
+            text = "問一次問題要消耗五枚金幣，目前金幣數為 " + str(coin) + ' 枚，'
+            text += "多回答問題來累積金幣吧~~" 
+            bot.send_message(get_chat_id(update), text)
+            return False
         return get_text(update).lower() == '/question'
 
     def is_going_to_state2(self, update):
@@ -352,7 +358,7 @@ class TocMachine(GraphMachine):
             # send message
             new_question = get_temp_question(get_chat_id(update))
             save_choice_question(get_chat_id(update), new_question)
-            text = "收到，您的問題已送出～請靜候其他同學的回覆. . . . ."
+            text = "收到，您的問題已送出～請靜候其他同學的回覆. . . . .\n 每五人回覆問題時會通知一次~"
 
             # cost coin
             update_user_coin_by_id(chat_id=get_chat_id(update), is_add=0)
