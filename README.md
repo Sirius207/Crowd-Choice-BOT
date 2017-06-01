@@ -68,7 +68,7 @@ The initial state is set to `user`.
 
 ## Database
 
-### TABLE QUESTION_ANSWER
+### TABLE: QUESTION_ANSWER
  	QUESTION_ID     INTEGER PRIMARY KEY     AUTOINCREMENT,
     ASKER_ID        INTEGER                 NOT NULL,
     DESCRIPTION     TEXT                    NOT NULL,
@@ -79,7 +79,7 @@ The initial state is set to `user`.
     STARS_COUNT     BLOB                    ,
     RAT_COUNT       INTEGER DEFAULT 0
 
-### TABLE QUESTION_ANSWER
+### TABLE: QUESTION_ANSWER
  	ANSWER_ID       INTEGER PRIMARY KEY     AUTOINCREMENT,
     QUESTION_ID     INTEGER                 NOT NULL,
     ANSWERER_ID     INTEGER                 NOT NULL,
@@ -90,7 +90,7 @@ The initial state is set to `user`.
     STARS_COUNT     BLOB                    ,
     RAT_COUNT       INTEGER DEFAULT 0
 
-### TABLE USER_PROFILE
+### TABLE: USER_PROFILE
 	USER_ID         INTEGER PRIMARY KEY     NOT NULL,
     GENDER          TEXT                    ,
     AGE             TEXT                    ,
