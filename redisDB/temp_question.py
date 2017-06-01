@@ -16,7 +16,7 @@ def save_temp_question(chat_id, question):
     '''temp save question to Redis'''
     to_save_question = {'content': question}
     redisDB.hset(name=chat_id, key=TEMP, value=json.dumps(to_save_question))
-    print 'save question success'
+    print ('save question success')
 
 def get_temp_question(chat_id):
     '''get temp question in Redis'''
@@ -25,7 +25,7 @@ def get_temp_question(chat_id):
 def remove_temp_question(chat_id):
     '''delete temp question in Redis'''
     redisDB.hdel(chat_id, TEMP)
-    print 'delete question success'
+    print ('delete question success')
 
 #
 # Options of Question
@@ -41,7 +41,7 @@ def save_temp_options(chat_id, options):
     '''temp save question to Redis'''
     question = set_temp_options(chat_id, options)
     redisDB.hset(name=chat_id, key=TEMP, value=json.dumps(question))
-    print 'save options success'
+    print ('save options success')
 
 #
 # Generate question
@@ -65,7 +65,7 @@ def save_current_question_ID(chat_id, question_id):
     '''temp save question to Redis'''
     to_save_question = {'question_ID': question_id}
     redisDB.hset(name=chat_id, key=CURR, value=json.dumps(to_save_question))
-    print 'save question id success'
+    print ('save question id success')
 
 
 def save_broadcast_question_ID(chat_id, question_id):
@@ -73,21 +73,21 @@ def save_broadcast_question_ID(chat_id, question_id):
     to_save_question = json.loads(redisDB.hget(name=chat_id, key=CURR))
     to_save_question['broadcast_question_ID'] = question_id
     redisDB.hset(name=chat_id, key=CURR, value=json.dumps(to_save_question))
-    print 'save broadcast question id success'
+    print ('save broadcast question id success')
 
 def reset_current_question_ID(chat_id):
     ''' reset current question_id '''
     to_save_question = json.loads(redisDB.hget(name=chat_id, key=CURR))
     to_save_question['question_ID'] = 0
     redisDB.hset(name=chat_id, key=CURR, value=json.dumps(to_save_question))
-    print 'reset question id success'
+    print ('reset question id success')
 
 def reset_broadcast_question_ID(chat_id):
     ''' reset current question_id '''
     to_save_question = json.loads(redisDB.hget(name=chat_id, key=CURR))
     to_save_question['broadcast_question_ID'] = 0
     redisDB.hset(name=chat_id, key=CURR, value=json.dumps(to_save_question))
-    print 'reset broadcast question id success'
+    print ('reset broadcast question id success')
 
 
 def get_current_question_ID(chat_id):
