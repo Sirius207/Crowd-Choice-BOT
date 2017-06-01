@@ -195,11 +195,14 @@ class TocMachine(GraphMachine):
         return get_text(update).lower() != ('/question' or '/answer')
 
 
-
     def is_valid_answer(self, update):
         if get_text(update) == 'answer-pass':
+            # remove broadcast question
+            reset_broadcast_question_ID(get_chat_id(update))
             self.new_question(update)
         elif get_text(update) == 'answer-cancel':
+            # remove broadcast question
+            reset_broadcast_question_ID(get_chat_id(update))
             self.go_back(update)
         else:
             question_id = get_current_question_ID(get_chat_id(update))
