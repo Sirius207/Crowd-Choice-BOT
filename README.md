@@ -21,7 +21,7 @@ pip install -r requirements.txt
 brew install redis
 ```
 
-### Launch Redis
+#### Launch Redis
 ```sh
 launchctl load ~/Library/LaunchAgents/homebrew.mxcl.redis.plist
 ```
@@ -58,17 +58,17 @@ The initial state is set to `user`.
 
 
 ## Command
-* question - Ask new question 
-* answer - Get a question and answer it 
-* info - Check Current condition 
-* mute - Mute new question notification
-* open - Open new question notification
-* setup - Setup User info
+* /start - Start the Bot (Create the user) or send command sheet
+* /question - Ask new question 
+* /answer - Get a question and answer it 
+* /info - Check Current condition 
+* /mute - Mute new question notification
+* /open - Open new question notification
+* /setup - Setup User info
 
 ## Database
 
-### QUESTION_ANSWER
-	Table QUESTION_ANSWER
+### TABLE QUESTION_ANSWER
  	QUESTION_ID     INTEGER PRIMARY KEY     AUTOINCREMENT,
     ASKER_ID        INTEGER                 NOT NULL,
     DESCRIPTION     TEXT                    NOT NULL,
@@ -79,7 +79,7 @@ The initial state is set to `user`.
     STARS_COUNT     BLOB                    ,
     RAT_COUNT       INTEGER DEFAULT 0
 
-### QUESTION_ANSWER
+### TABLE QUESTION_ANSWER
  	ANSWER_ID       INTEGER PRIMARY KEY     AUTOINCREMENT,
     QUESTION_ID     INTEGER                 NOT NULL,
     ANSWERER_ID     INTEGER                 NOT NULL,
@@ -90,7 +90,7 @@ The initial state is set to `user`.
     STARS_COUNT     BLOB                    ,
     RAT_COUNT       INTEGER DEFAULT 0
 
-### USER_PROFILE
+### TABLE USER_PROFILE
 	USER_ID         INTEGER PRIMARY KEY     NOT NULL,
     GENDER          TEXT                    ,
     AGE             TEXT                    ,
@@ -104,4 +104,4 @@ The initial state is set to `user`.
 
 
 ## Fork From 
-[Lee-W](https://github.com/Lee-W)
+[Lee-W TOC-Project-2017](https://github.com/Lee-W/TOC-Project-2017)
