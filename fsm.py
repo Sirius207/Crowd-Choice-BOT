@@ -292,7 +292,7 @@ class TocMachine(GraphMachine):
     def on_enter_state1(self, update):
         bot.send_message(
             chat_id=get_chat_id(update),
-            text="I'm entering state1.  請輸入您的問題~ "
+            text="請輸入您的問題~ "
             + get_first_name(update).encode('utf-8')
             + " 同學 > w <")
 
@@ -307,7 +307,7 @@ class TocMachine(GraphMachine):
         text = get_text(update)
         save_temp_question(chat_id=get_chat_id(update), question=text)
         # send message
-        text = "I'm entering state3, 請繼續輸入問題的選項，一行為一個選項 (可輸入shift + enter 換行)，最多可輸入四個～"
+        text = "請繼續輸入問題的選項，一行為一個選項 (可輸入shift + enter 換行)，最多可輸入四個～"
         bot.send_message(chat_id=get_chat_id(update), text=text)
 
     def on_exit_state3(self, update):
