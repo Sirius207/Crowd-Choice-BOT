@@ -3,46 +3,15 @@ from io import BytesIO
 
 import telegram
 from flask import Flask, request, send_file
+from machine import machine
+from config import bot_config
+from bot_route import bot_route
 
-from fsm import TocMachine
-
-API_TOKEN = '286227588:AAF-vT00dFv59r1-pxViYuNh3ubGV6TTE2A'
-WEBHOOK_URL = 'https://hidden-plains-84407.herokuapp.com/hook'
+API_TOKEN = bot_config['API_TOKEN']
+WEBHOOK_URL = bot_config['WEBHOOK_URL']
 
 app = Flask(__name__)
 bot = telegram.Bot(token=API_TOKEN)
-machine = TocMachine(
-    states=[
-        'user',
-        'state1',
-        'state2'
-    ],
-    transitions=[
-        {
-            'trigger': 'advance',
-            'source': 'user',
-            'dest': 'state1',
-            'conditions': 'is_going_to_state1'
-        },
-        {
-            'trigger': 'advance',
-            'source': 'user',
-            'dest': 'state2',
-            'conditions': 'is_going_to_state2'
-        },
-        {
-            'trigger': 'go_back',
-            'source': [
-                'state1',
-                'state2'
-            ],
-            'dest': 'user'
-        }
-    ],
-    initial='user',
-    auto_transitions=False,
-    show_conditions=True,
-)
 
 
 def _set_webhook():
@@ -56,8 +25,10 @@ def _set_webhook():
 
 @app.route('/hook', methods=['POST'])
 def webhook_handler():
+    print 'SYSTEM'
+    print machine.state
     update = telegram.Update.de_json(request.get_json(force=True), bot)
-    machine.advance(update)
+    bot_route(update)
     return 'ok'
 
 
