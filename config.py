@@ -52,8 +52,8 @@ conn.execute('''CREATE TABLE IF NOT EXISTS USER_PROFILE(
 bot_config = {
     'redisDB': redisDB,
     'sqlConn': conn,
-    'API_TOKEN': '#',
-    'WEBHOOK_URL': '#',
+    'API_TOKEN': '286227588:AAF-vT00dFv59r1-pxViYuNh3ubGV6TTE2A',
+    'WEBHOOK_URL': 'https://dry-badlands-35040.herokuapp.com/hook',
     'WELCOME_TEXT': '歡迎使用 "神奇海螺" \n 你可於此發問，或是提出問題。 每詢問一個問題會消耗五枚金幣，每回答一個問題會增加一枚金幣，祝你玩得愉快~ \n \
 指令說明: \n question - Ask new question \n \
 answer - Get a question and answer it \n \
