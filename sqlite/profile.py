@@ -26,7 +26,7 @@ def get_user_by_id(chat_id):
 
 def get_available_users_id_list():
     ''' get user id list '''
-    sql = 'SELECT USER_ID FROM USER_PROFILE WHERE SUBSCRIBE != "Off" AND STATE = "USER" '
+    sql = 'SELECT USER_ID FROM USER_PROFILE WHERE SUBSCRIBE != "Off" AND STATE = "user" '
     cursor.execute(sql)
     users = cursor.fetchall()
     return users
@@ -86,7 +86,7 @@ def get_user_profile_text(chat_id):
 #
 
 def create_new_user(chat_id):
-    '''save user gender to Sqlite'''
+    '''create user to Sqlite'''
     time = datetime.datetime.now()
     sql = 'INSERT INTO USER_PROFILE (USER_ID, CREATED_AT) VALUES (?,?)'
     cursor.execute(sql, [chat_id, time])

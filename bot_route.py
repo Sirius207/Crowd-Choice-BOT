@@ -18,7 +18,8 @@ def bot_route(update):
     ''' bot process '''
     user_state = get_user_state_by_id(get_chat_id(update))
     # move to user state
-    machine.state = user_state
+    if user_state != 0:
+        machine.state = user_state
 
     # execute command
     try:
