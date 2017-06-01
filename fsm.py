@@ -78,7 +78,7 @@ def broadcast_question(question):
     ''' broadcast new question to avaliable user'''
     users_id_list = get_available_users_id_list()
     full_question = get_choice_question_by_description(question['content'])
-    print users_id_list
+    print (users_id_list)
     for index, element in enumerate(users_id_list):
         # send new question messgage
         send_question(element[0], full_question)
