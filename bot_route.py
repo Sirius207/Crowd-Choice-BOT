@@ -10,7 +10,7 @@ command = {
     '/mute': machine.mute,
     '/open': machine.open,
     '/answer': machine.answer,
-    '/old_question': machine.old_question
+    '/old': machine.old_question
 }
 
 

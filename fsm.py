@@ -383,7 +383,7 @@ class TocMachine(GraphMachine):
         print (question_id)
         question = get_new_choice_question(get_chat_id(update), question_id)
         if question == 0:
-            text = '目前還沒有新問題！ 輸入/old-question 可重新呼叫跳過的舊問題~'
+            text = '目前還沒有新問題！ 輸入/old 可重新呼叫跳過的舊問題~'
             bot.send_message(chat_id=get_chat_id(update), text=text)
             self.go_back(update)
         else:

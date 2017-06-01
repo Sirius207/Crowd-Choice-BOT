@@ -27,12 +27,21 @@ def save_choice_question(chat_id, question):
 
 def get_new_choice_question(chat_id, question_id):
     '''get next question which not ask by current user'''
-    sql = 'SELECT * FROM CHOICE_QUESTION WHERE \
-        type = "choice" \
-        AND ASKER_ID != ? \
-        AND QUESTION_ID > ?'
+    sql = ' SELECT * \
+            FROM CHOICE_QUESTION  C \
+            WHERE \
+                C.type = "choice" \
+                AND C.ASKER_ID !=  ?\
+                AND C.QUESTION_ID > ?  \
+		        AND NOT EXISTS (\
+                    SELECT * \
+			        FROM QUESTION_ANSWER  Q\
+                    WHERE   \
+				        Q.ANSWERER_ID = ? \
+				        AND Q.QUESTION_ID = C.QUESTION_ID\
+		        ) '
 
-    cursor.execute(sql, [chat_id, question_id])
+    cursor.execute(sql, [chat_id, question_id, chat_id])
     questions = cursor.fetchall()
 
     # no more questions
