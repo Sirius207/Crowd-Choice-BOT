@@ -87,3 +87,9 @@ ENV/
 
 # Rope project settings
 .ropeproject
+
+# Config file
+config.py
+
+# Database
+questions.db
