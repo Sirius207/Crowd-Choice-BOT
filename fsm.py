@@ -32,6 +32,7 @@ AGE_LIST = bot_config['age_list']
 GENDER_LIST = bot_config['gender_list']
 WELCOME_TEXT = bot_config['WELCOME_TEXT']
 HELP_TEXT = bot_config['HELP_TEXT']
+BAN_COUNT = 3
 
 API_TOKEN = bot_config['API_TOKEN']
 bot = telegram.Bot(token=API_TOKEN)
@@ -190,7 +191,7 @@ class TocMachine(GraphMachine):
         # check ban condition
         expired_date = is_user_ban_by_id(get_chat_id(update))
         if expired_date != 'FREE':
-            text = '您因為先前提問的問題被五個人檢舉而被水桶(Ban)了!  ' + expired_date + ' 後才能提問!'
+            text = '您因為先前提問的問題被三個人檢舉而被水桶(Ban)了!  ' + expired_date + ' 後才能提問!'
             bot.send_message(get_chat_id(update), text)
             return False
 
@@ -436,8 +437,14 @@ class TocMachine(GraphMachine):
         # rat count plus 1
         update_question_rat_by_id(question_id)
 
+        # notice origin asker
+        question = get_choice_question_by_ID(question_id)
+        text = '您先前提出的問題：' + question[2].encode('utf-8')
+        text += '\n因為 ' + reason.encode('utf-8') + ' 被檢舉囉~ 請注意~~'
+        bot.send_message(chat_id=question[1], text=text)
+
         # ban user if needed
-        if get_choice_question_rat_by_id(question_id) >= 2:
+        if get_choice_question_rat_by_id(question_id) >= BAN_COUNT:
             update_user_rat_by_id(chat_id=get_chat_id(update), is_rat=1)
 
         # remove broadcast question (if is broadcast question)
