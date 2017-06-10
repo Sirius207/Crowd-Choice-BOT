@@ -80,7 +80,27 @@ def get_user_profile_text(chat_id):
     text += '等級為 ' + str(level) + ' !'
     return text
 
+def get_user_condition_by_id(chat_id):
+    ''' get rat condition by user'''
+    sql = 'SELECT CONDITION FROM USER_PROFILE WHERE USER_ID = ?'
+    cursor.execute(sql, [chat_id])
+    condition = cursor.fetchall()
+    return condition[0][0]
 
+
+def is_user_ban_by_id(chat_id):
+    ''' send user rat condition '''
+    text = get_user_condition_by_id(chat_id).split('#')
+    if text == 'NORMAL':
+        return 'FREE'
+
+    today = datetime.datetime.now()
+    expired_day = datetime.datetime.strptime(text[1], '%m/%d-%y')
+    if text[0] == 'rat' and expired_day > today:
+        return str(expired_day)
+    else:
+        update_user_rat_by_id(chat_id=chat_id, is_rat=0)
+        return 'FREE'
 #
 # setup
 #
@@ -128,7 +148,7 @@ def update_user_rat_by_id(chat_id, is_rat):
     ''' rat or cancel rating by user_id. is_rat = 1|0'''
     expired_day = datetime.datetime.today() + datetime.timedelta(days=5)
     expired_day = expired_day.strftime("%m/%d-%y")
-    rat_date = '#rat#'
+    rat_date = 'rat#'
     rat_date += expired_day.encode('utf-8') if is_rat else 'NORMAL'
     sql = 'UPDATE USER_PROFILE SET CONDITION = ?, RAT_COUNT = RAT_COUNT + ?  WHERE USER_ID = ?;'
     cursor.execute(sql, [rat_date, is_rat, chat_id])

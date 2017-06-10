@@ -24,7 +24,7 @@ from sqlite.profile import (
     get_user_by_id, get_available_users_id_list, get_user_profile_text,
     create_new_user, save_gender_profile, save_age_profile, update_user_state_by_id,
     update_user_subscribe_by_id, update_user_coin_by_id, get_user_coin_by_id,
-    update_user_rat_by_id
+    update_user_rat_by_id, is_user_ban_by_id
 )
 
 from config import bot_config
@@ -185,11 +185,20 @@ class TocMachine(GraphMachine):
     #
 
     def is_going_to_state1(self, update):
+        ''' check asker condition '''
         print ('check state1')
+        # check ban condition
+        expired_date = is_user_ban_by_id(get_chat_id(update))
+        if expired_date != 'FREE':
+            text = '您因為先前提問的問題被五個人檢舉而被水桶(Ban)了!  ' + expired_date + ' 後才能提問!'
+            bot.send_message(get_chat_id(update), text)
+            return False
+
+        # check coin number
         coin = get_user_coin_by_id(get_chat_id(update))
         if coin - 5 < 0:
             text = "問一次問題要消耗五枚金幣，目前金幣數為 " + str(coin) + ' 枚，'
-            text += "多回答問題來累積金幣吧~~" 
+            text += "多回答問題來累積金幣吧~~"
             bot.send_message(get_chat_id(update), text)
             return False
         return get_text(update).lower() == '/question'
