@@ -13,7 +13,8 @@ from redisDB.temp_question import *
 
 from sqlite.question import (
     save_choice_question, get_new_choice_question, get_choice_question_by_description,
-    get_choice_question_by_ID, get_choice_question_text, update_question_rat_by_id
+    get_choice_question_by_ID, get_choice_question_text, update_question_rat_by_id,
+    get_choice_question_rat_by_id
 )
 from sqlite.answer import (
     save_choice_answer, save_choice_answer_rat, get_choice_answer_statistics,
@@ -22,7 +23,8 @@ from sqlite.answer import (
 from sqlite.profile import (
     get_user_by_id, get_available_users_id_list, get_user_profile_text,
     create_new_user, save_gender_profile, save_age_profile, update_user_state_by_id,
-    update_user_subscribe_by_id, update_user_coin_by_id, get_user_coin_by_id
+    update_user_subscribe_by_id, update_user_coin_by_id, get_user_coin_by_id,
+    update_user_rat_by_id
 )
 
 from config import bot_config
@@ -408,11 +410,11 @@ class TocMachine(GraphMachine):
 
     def on_exit_state2(self, update):
         print ('Leaving state2')
-    
+
     def on_enter_rat_question(self, update):
         text = '好的！ 請輸入您檢舉這則問題的原因~'
         bot.send_message(chat_id=get_chat_id(update), text=text)
-    
+
     def on_exit_rat_question(self, update):
         reason = get_text(update)
         text = '收到！ 您提出的原因為： ' + reason.encode('utf-8') + ' 檢舉已提出!'
@@ -424,6 +426,10 @@ class TocMachine(GraphMachine):
 
         # rat count plus 1
         update_question_rat_by_id(question_id)
+
+        # ban user if needed
+        if get_choice_question_rat_by_id(question_id) >= 2:
+            update_user_rat_by_id(chat_id=get_chat_id(update), is_rat=1)
 
         # remove broadcast question (if is broadcast question)
         reset_broadcast_question_ID(get_chat_id(update))

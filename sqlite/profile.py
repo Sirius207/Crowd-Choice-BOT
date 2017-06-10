@@ -124,7 +124,15 @@ def update_user_coin_by_id(chat_id, is_add):
     cursor.execute(sql, [add_number, chat_id])
     conn.commit()
 
-
+def update_user_rat_by_id(chat_id, is_rat):
+    ''' rat or cancel rating by user_id. is_rat = 1|0'''
+    expired_day = datetime.datetime.today() + datetime.timedelta(days=5)
+    expired_day = expired_day.strftime("%m/%d-%y")
+    rat_date = '#rat#'
+    rat_date += expired_day.encode('utf-8') if is_rat else 'NORMAL'
+    sql = 'UPDATE USER_PROFILE SET CONDITION = ?, RAT_COUNT = RAT_COUNT + ?  WHERE USER_ID = ?;'
+    cursor.execute(sql, [rat_date, is_rat, chat_id])
+    conn.commit()
 
 
 

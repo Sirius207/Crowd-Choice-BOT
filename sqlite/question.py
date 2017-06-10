@@ -75,6 +75,12 @@ def get_choice_question_text(question):
     text += '"\n\n選項有:\n' + options.encode('utf-8')
     return text
 
+def get_choice_question_rat_by_id(question_id):
+    '''get question rat by question ID'''
+    sql = 'SELECT RAT_COUNT FROM CHOICE_QUESTION WHERE QUESTION_ID = ?'
+    cursor.execute(sql, [question_id])
+    questions = cursor.fetchall()
+    return questions[0]
 #
 # update question rat
 #
