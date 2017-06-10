@@ -13,10 +13,10 @@ from redisDB.temp_question import *
 
 from sqlite.question import (
     save_choice_question, get_new_choice_question, get_choice_question_by_description,
-    get_choice_question_by_ID, get_choice_question_text
+    get_choice_question_by_ID, get_choice_question_text, update_question_rat_by_id
 )
 from sqlite.answer import (
-    save_choice_answer, get_choice_answer_statistics,
+    save_choice_answer, save_choice_answer_rat, get_choice_answer_statistics,
     generate_answer_statistics_html, get_choice_answer
 )
 from sqlite.profile import (
@@ -210,6 +210,9 @@ class TocMachine(GraphMachine):
             # remove broadcast question
             reset_broadcast_question_ID(get_chat_id(update))
             self.go_back(update)
+        elif get_text(update) == 'answer-rat':
+            # go to type rat reason state
+            self.rat(update)
         else:
             question_id = get_current_question_ID(get_chat_id(update))
             question = get_choice_question_by_ID(question_id)
@@ -405,4 +408,24 @@ class TocMachine(GraphMachine):
 
     def on_exit_state2(self, update):
         print ('Leaving state2')
+    
+    def on_enter_rat_question(self, update):
+        text = '好的！ 請輸入您檢舉這則問題的原因~'
+        bot.send_message(chat_id=get_chat_id(update), text=text)
+    
+    def on_exit_rat_question(self, update):
+        reason = get_text(update)
+        text = '收到！ 您提出的原因為： ' + reason.encode('utf-8') + ' 檢舉已提出!'
+        bot.send_message(chat_id=get_chat_id(update), text=text)
 
+        # save answer to sqlite (rat this question)
+        question_id = get_current_question_ID(get_chat_id(update))
+        save_choice_answer_rat(get_chat_id(update), question_id, reason)
+
+        # rat count plus 1
+        update_question_rat_by_id(question_id)
+
+        # remove broadcast question (if is broadcast question)
+        reset_broadcast_question_ID(get_chat_id(update))
+
+        print ('Leaving rat')

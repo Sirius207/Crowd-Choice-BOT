@@ -18,10 +18,19 @@ def save_choice_answer(chat_id, question_id, answer):
     cursor.execute(sql, [question_id, chat_id, answer, "choice", time])
     conn.commit()
 
+def save_choice_answer_rat(chat_id, question_id, answer):
+    '''save choice question to Sqlite'''
+    time = datetime.datetime.now()
+
+    sql = 'INSERT INTO QUESTION_ANSWER (QUESTION_ID, ANSWERER_ID , ANSWER, TYPE, CREATED_AT) \
+        VALUES (?,?,?,?,?)'
+    cursor.execute(sql, [question_id, chat_id, answer, "rat", time])
+    conn.commit()
+
 
 def get_choice_answer(question_id):
     ''' get question answers list'''
-    sql = 'SELECT  ANSWER from QUESTION_ANSWER WHERE QUESTION_ID == ?'
+    sql = 'SELECT  ANSWER from QUESTION_ANSWER WHERE QUESTION_ID == ? And Type != "rat"'
     cursor.execute(sql, [question_id])
     conn.commit()
     answers = cursor.fetchall()

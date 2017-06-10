@@ -75,3 +75,14 @@ def get_choice_question_text(question):
     text += '"\n\n選項有:\n' + options.encode('utf-8')
     return text
 
+#
+# update question rat
+#
+
+def update_question_rat_by_id(question_id):
+    ''' rat question '''
+    sql = 'UPDATE CHOICE_QUESTION SET RAT_COUNT = RAT_COUNT + 1  WHERE QUESTION_ID = ?'
+    cursor.execute(sql, [question_id])
+    conn.commit()
+
+

@@ -9,6 +9,7 @@ machine = TocMachine(
         'state3',
         'state4',
         'state2',
+        'rat_question'
     ],
     transitions=[
         # initial setup
@@ -117,6 +118,16 @@ machine = TocMachine(
             'trigger': 'new_question',
             'source': 'state2',
             'dest': 'state2',
+        },
+        {
+            'trigger': 'rat',
+            'source': 'state2',
+            'dest': 'rat_question',
+        },
+        {
+            'trigger': 'advance',
+            'source': 'rat_question',
+            'dest': 'user',
         },
         {
             'trigger': 'old_question',
