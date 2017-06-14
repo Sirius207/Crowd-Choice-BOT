@@ -18,7 +18,7 @@
         <li id='answer-{{answer[0]}}'>
             <span>{{ answer[3]}}</span>
             <button class="bonus">狂</button>
-            <button class="bonus">讚</button>
+            <button class="bonus">Good</button>
             <button class="rat">檢舉</button>
         </li>
         {% endfor %}
@@ -27,16 +27,29 @@
         crossorigin="anonymous"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/axios/0.16.2/axios.min.js"></script>
     <script>
-        $.urlParam = function(name){
-	        const results = new RegExp('[\?&]' + name + '=([^&#]*)').exec(window.location.href);
-	        return results[1] || 0;
+        $.urlParam = function (name) {
+            const results = new RegExp('[\?&]' + name + '=([^&#]*)').exec(window.location.href)
+            return results[1] || 0
         }
         $(".answers_list").delegate(".rat", "click", function () {
-            const answer_id = $( this ).parent().attr('id').replace('answer-', '')
+            if($('.rat-submit').length == 0) {
+                html = '<input type="text" name="reason" placeholder="請輸入原因~">'
+                html += '<button class="rat-submit">送出</button>'
+                $(this).after(html)
+            } else {
+                $("input[name=reason]").remove()
+                $( ".rat-submit" ).remove()
+            }
+        })
+        $(".answers_list").delegate(".rat-submit", "click", function () {
+            const answer_id = $(this).parent().attr('id').replace('answer-', '')
+            const reason = $("input[name=reason]").val();
+            send_rat(answer_id, reason)
+        })
+        const send_rat = (answer_id, reason) => {
             const chat_id = $.urlParam('user')
             const hash_value = $.urlParam('hash')
             const route = window.location.pathname
-            const reason = 'start'
             axios.post(route, {
                     chat_id: chat_id,
                     answer_id: answer_id,
@@ -44,12 +57,20 @@
                     reason: reason
                 })
                 .then(function (response) {
-                    console.log(response);
+                    console.log(response)
+                    $( ".rat-submit" ).after('<span class="message">檢舉成功!</span>')
+                    remove_ratbox() 
                 })
                 .catch(function (error) {
-                    console.log(error);
+                    console.log(error)
+                    $( ".rat-submit" ).after('<span class="message">可能重複檢舉了!</span>')
+                    remove_ratbox()
                 });
-        });
+        }
+        const remove_ratbox = () => {
+            $("input[name=reason]").remove()
+            $( ".rat-submit" ).remove()
+        }
     </script>
 </body>
 
