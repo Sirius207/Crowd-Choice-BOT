@@ -58,7 +58,7 @@ def send_question(chat_id, question):
 
     # generate message
     text = '您有一則新問題，ID:'
-    text += question[0] + '\n'
+    text += str(question[0]) + '\n'
     # check button list
     question_type = question[5]
     if question_type == 'choice':
@@ -117,12 +117,19 @@ def handle_normal_answer(update, question):
     link = INDEX_URL + 'question/' + str(question[0]) + '?user=' + str(get_chat_id(update))
     link += '&hash=' + hashlib.sha224(hash_value).hexdigest()
     # send answers link to answerer
-    text = '現在可以從 <a href="'
+    text = '可以從 <a href="'
     text += link
     text += '">這裡</a> 查看其他人的回答～'
     bot.send_message(chat_id=get_chat_id(update),
                      text=text,
                      parse_mode=telegram.ParseMode.HTML)
+
+    asker_subscribe = get_user_by_id(question[1])[3]
+    if asker_subscribe == 'On':
+        text = '您的問題： ' + question[2] + '\n' + text
+        bot.send_message(chat_id=question[1],
+                         text=text,
+                         parse_mode=telegram.ParseMode.HTML)
 
     return True
 
@@ -146,8 +153,9 @@ def handle_choice_answer(update, question):
         )
 
         # send statistics back to ori asker each 5 answer
+        asker_subscribe = get_user_by_id(question[1])[3]
         answers_count = len(get_choice_answer(question_id))
-        if answers_count % 5 == 0:
+        if answers_count % 5 == 0 and asker_subscribe == 'On':
             text = get_choice_question_text(question) + '\n' + text
             bot.send_message(
                 chat_id=question[1], text=text,
