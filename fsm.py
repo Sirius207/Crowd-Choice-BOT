@@ -330,9 +330,21 @@ class TocMachine(GraphMachine):
         # save question
         text = get_text(update)
         save_temp_question(chat_id=get_chat_id(update), question=text)
+        # prepare pass button
+        button_list = [
+            InlineKeyboardButton("跳過（詢問簡答題）", callback_data="pass"),
+        ]
+        reply_markup = InlineKeyboardMarkup(
+            build_menu(
+                button_list,
+                n_cols=1,
+                header_buttons=None,
+                footer_buttons=None
+            )
+        )
         # send message
-        text = "請繼續輸入問題的選項，一行為一個選項 (可輸入shift + enter 換行)，最多可輸入四個～"
-        bot.send_message(chat_id=get_chat_id(update), text=text)
+        text = "請繼續輸入問題的選項，一行為一個選項 (可輸入shift + enter 換行)，或是點擊'跳過'詢問簡答題~~"
+        bot.send_message(chat_id=get_chat_id(update), text=text, reply_markup=reply_markup)
 
     def on_exit_state3(self, update):
         print ('Leaving state3')

@@ -91,10 +91,11 @@ def get_user_condition_by_id(chat_id):
 
 def is_user_ban_by_id(chat_id):
     ''' send user rat condition '''
-    text = get_user_condition_by_id(chat_id).split('#')
+    text = get_user_condition_by_id(chat_id)
     if text == 'NORMAL':
         return 'FREE'
 
+    text = text.split('#')
     today = datetime.datetime.now()
     expired_day = datetime.datetime.strptime(text[1], '%m/%d-%y')
     if text[0] == 'rat' and expired_day > today:
