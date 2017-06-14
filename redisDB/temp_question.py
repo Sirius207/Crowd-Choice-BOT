@@ -44,16 +44,37 @@ def save_temp_options(chat_id, options):
     print ('save options success')
 
 #
+# Type of Question
+#
+
+def set_temp_question_type(chat_id, question_type):
+    ''' set type value in dict question'''
+    question = get_temp_question(chat_id)
+    question['question_type'] = question_type
+    return question
+
+def save_temp_question_type(chat_id, question_type):
+    '''temp save question to Redis'''
+    question = set_temp_question_type(chat_id, question_type)
+    redisDB.hset(name=chat_id, key=TEMP, value=json.dumps(question))
+    print ('save type success')
+
+#
 # Generate question
 #
 
 def get_temp_question_html(chat_id):
     '''return question & options with html format '''
-    question_content = get_temp_question(chat_id)['content'].encode('utf-8')
-    question_options = get_temp_question(chat_id)['options']
-    question = '<b>Q: \n' + question_content  + '</b>\n\nA:\n'
-    for index, element in enumerate(question_options):
-        question += '(' + str(index + 1) + ') ' + element.encode('utf-8') + '\n'
+    question_data =  get_temp_question(chat_id)
+    question_content = question_data['content'].encode('utf-8')
+    question_options = question_data['options']
+    question_type    = question_data['question_type']
+    question = '<b>Q: \n' + question_content  + '</b>\n\n'
+
+    if question_type == 'choice':
+        question += 'A:\n'
+        for index, element in enumerate(question_options):
+            question += '(' + str(index + 1) + ') ' + element.encode('utf-8') + '\n'
 
     return question
 

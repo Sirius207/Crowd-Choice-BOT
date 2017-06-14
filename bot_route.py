@@ -23,6 +23,7 @@ def bot_route(update):
 
     # execute command
     try:
+        print get_text(update)
         command[get_text(update)](update)
     except KeyError:
         machine.advance(update)

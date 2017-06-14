@@ -9,15 +9,17 @@ from telegram import InlineKeyboardButton, InlineKeyboardMarkup
 
 from get_message_info import (get_text, get_first_name, get_chat_id)
 
+from send_message import (build_menu, broadcast_question, send_question, handle_answer)
+
 from redisDB.temp_question import *
 
 from sqlite.question import (
-    save_choice_question, get_new_choice_question, get_choice_question_by_description,
-    get_choice_question_by_ID, get_choice_question_text, update_question_rat_by_id,
+    save_question, get_new_choice_question, get_question_by_description,
+    get_question_by_ID, get_choice_question_text, update_question_rat_by_id,
     get_choice_question_rat_by_id
 )
 from sqlite.answer import (
-    save_choice_answer, save_choice_answer_rat, get_choice_answer_statistics,
+    save_answer, save_choice_answer_rat, get_choice_answer_statistics,
     generate_answer_statistics_html, get_choice_answer
 )
 from sqlite.profile import (
@@ -36,58 +38,6 @@ BAN_COUNT = 3
 
 API_TOKEN = bot_config['API_TOKEN']
 bot = telegram.Bot(token=API_TOKEN)
-
-
-def build_menu(buttons,
-               n_cols,
-               header_buttons,
-               footer_buttons):
-    menu = [buttons[i:i + n_cols] for i in range(0, len(buttons), n_cols)]
-    if header_buttons:
-        menu.insert(0, header_buttons)
-    if footer_buttons:
-        menu.append(footer_buttons)
-    return menu
-
-
-def send_question(chat_id, question):
-    '''send new question to single user'''
-    # generate keyboard
-    button_list = [
-        InlineKeyboardButton("跳過", callback_data="answer-pass"),
-        InlineKeyboardButton("取消回答", callback_data="answer-cancel"),
-        InlineKeyboardButton("這問題不適當", callback_data="answer-rat"),
-    ]
-    for index, element in enumerate(question[3].split('\n')):
-        button_list.append(InlineKeyboardButton(element, callback_data=element))
-    reply_markup = InlineKeyboardMarkup(
-        build_menu(
-            button_list,
-            n_cols=3,
-            header_buttons=None,
-            footer_buttons=None
-        )
-    )
-
-    # generate message
-    text = '您有一則新問題，' + get_choice_question_text(question)
-    text += '\n\n請直接點選選項回答~'
-    bot.send_message(chat_id=chat_id,
-                     text=text, reply_markup=reply_markup)
-
-
-
-def broadcast_question(question):
-    ''' broadcast new question to avaliable user'''
-    users_id_list = get_available_users_id_list()
-    full_question = get_choice_question_by_description(question['content'])
-    print (users_id_list)
-    for index, element in enumerate(users_id_list):
-        # send new question messgage
-        send_question(element[0], full_question)
-        # save current question for that user
-        save_broadcast_question_ID(element[0], full_question[0])
-        update_user_state_by_id(element[0], 'state2')
 
 
 class TocMachine(GraphMachine):
@@ -227,40 +177,8 @@ class TocMachine(GraphMachine):
             self.rat(update)
         else:
             question_id = get_current_question_ID(get_chat_id(update))
-            question = get_choice_question_by_ID(question_id)
-            # check answer is valid
-            if get_text(update) not in question[3].split('\n'):
-                text = "請直接點選底下的按鈕進行回答！"
-                bot.send_message(get_chat_id(update), text)
-            else:
-                # save answer to sqlite
-                save_choice_answer(get_chat_id(update), question_id, get_text(update))
-
-                # send first message
-                text = get_text(update).encode('utf-8') + ', 已收到您的回答! 金幣數加 1!'
-                bot.send_message(get_chat_id(update), text)
-
-                # add coin
-                update_user_coin_by_id(chat_id=get_chat_id(update), is_add=1)
-                text = '目前金幣數為：' + str(get_user_coin_by_id(get_chat_id(update))) + ' ~~'
-                bot.send_message(get_chat_id(update), text)
-
-                # send statistics message
-                text = generate_answer_statistics_html(question_id)
-                bot.send_message(
-                    chat_id=get_chat_id(update), text=text,
-                    parse_mode=telegram.ParseMode.HTML
-                )
-
-                # send statistics back to ori asker
-                answers_count = len(get_choice_answer(question_id))
-                if answers_count%5 == 0:
-                    text = get_choice_question_text(question) + '\n' + text
-                    bot.send_message(
-                        chat_id=question[1], text=text,
-                        parse_mode=telegram.ParseMode.HTML
-                    )
-
+            question = get_question_by_ID(question_id)
+            if handle_answer(update, question):
                 # remove broadcast question
                 reset_broadcast_question_ID(get_chat_id(update))
                 self.go_back(update)
@@ -332,7 +250,7 @@ class TocMachine(GraphMachine):
         save_temp_question(chat_id=get_chat_id(update), question=text)
         # prepare pass button
         button_list = [
-            InlineKeyboardButton("跳過（詢問簡答題）", callback_data="pass"),
+            InlineKeyboardButton("跳過（詢問簡答題）", callback_data="#pass"),
         ]
         reply_markup = InlineKeyboardMarkup(
             build_menu(
@@ -356,7 +274,9 @@ class TocMachine(GraphMachine):
         # save option in redis
         options = get_text(update).split('\n')
         save_temp_options(get_chat_id(update), options)
-
+        # save question type
+        question_type = 'choice' if options[0] != '#pass' else 'normal'
+        save_temp_question_type(get_chat_id(update), question_type)
         # prepare send message
         button_list = [
             InlineKeyboardButton("取消發問", callback_data="no"),
@@ -382,10 +302,9 @@ class TocMachine(GraphMachine):
     def on_exit_state4(self, update):
         if update.callback_query.data == 'yes':
 
-            # send message
+            # save question
             new_question = get_temp_question(get_chat_id(update))
-            save_choice_question(get_chat_id(update), new_question)
-            text = "收到，您的問題已送出～請靜候其他同學的回覆. . . . .\n 每五人回覆問題時會通知一次~"
+            save_question(get_chat_id(update), new_question)
 
             # cost coin
             update_user_coin_by_id(chat_id=get_chat_id(update), is_add=0)
@@ -395,6 +314,9 @@ class TocMachine(GraphMachine):
 
             # remove redis question
             remove_temp_question(get_chat_id(update))
+
+            # set message
+            text = "收到，您的問題已送出～請靜候其他同學的回覆. . . . .\n 每五人回覆問題時會通知一次~"
 
         elif update.callback_query.data == 'no':
             remove_temp_question(get_chat_id(update))
@@ -450,7 +372,7 @@ class TocMachine(GraphMachine):
         update_question_rat_by_id(question_id)
 
         # notice origin asker
-        question = get_choice_question_by_ID(question_id)
+        question = get_question_by_ID(question_id)
         text = '您先前提出的問題：' + question[2].encode('utf-8')
         text += '\n因為 ' + reason.encode('utf-8') + ' 被檢舉囉~ 請注意~~'
         bot.send_message(chat_id=question[1], text=text)

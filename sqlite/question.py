@@ -11,6 +11,15 @@ cursor = conn.cursor()
 # save question
 #
 
+def save_question(chat_id, question):
+    ''' choose save question function by type '''
+    save_by_type = {
+        'choice': save_choice_question,
+        'normal': save_normal_question
+    }
+    save_by_type[question['question_type']](chat_id, question)
+
+
 def save_choice_question(chat_id, question):
     '''save choice question to Sqlite'''
     content = question['content']
@@ -19,6 +28,15 @@ def save_choice_question(chat_id, question):
     sql = 'INSERT INTO CHOICE_QUESTION (ASKER_ID, DESCRIPTION, OPTIONS, TYPE, CREATED_AT) \
         VALUES (?,?,?,?,?)'
     cursor.execute(sql, [chat_id, content, options, "choice", time])
+    conn.commit()
+
+def save_normal_question(chat_id, question):
+    '''save choice question to Sqlite'''
+    content = question['content']
+    time = datetime.datetime.now()
+    sql = 'INSERT INTO CHOICE_QUESTION (ASKER_ID, DESCRIPTION, TYPE, CREATED_AT) \
+        VALUES (?,?,?,?)'
+    cursor.execute(sql, [chat_id, content, "normal", time])
     conn.commit()
 
 #
@@ -30,8 +48,7 @@ def get_new_choice_question(chat_id, question_id):
     sql = ' SELECT * \
             FROM CHOICE_QUESTION  C \
             WHERE \
-                C.type = "choice" \
-                AND C.ASKER_ID !=  ?\
+                C.ASKER_ID !=  ?\
                 AND C.QUESTION_ID > ?  \
 		        AND NOT EXISTS (\
                     SELECT * \
@@ -50,14 +67,14 @@ def get_new_choice_question(chat_id, question_id):
 
     return questions[0]
 
-def get_choice_question_by_ID(question_id):
+def get_question_by_ID(question_id):
     '''get question by question ID'''
     sql = 'SELECT * FROM CHOICE_QUESTION WHERE QUESTION_ID = ?'
     cursor.execute(sql, [question_id])
     questions = cursor.fetchall()
     return questions[0]
 
-def get_choice_question_by_description(description):
+def get_question_by_description(description):
     '''get question by question ID'''
     sql = 'SELECT * FROM CHOICE_QUESTION WHERE DESCRIPTION = ?'
     cursor.execute(sql, [description])
@@ -73,6 +90,11 @@ def get_choice_question_text(question):
     options = '\n'.join(question[3].split('\n'))
     text = '問題內容為：\n '+ question[2].encode('utf-8')
     text += '"\n\n選項有:\n' + options.encode('utf-8')
+    return text
+
+def get_normal_question_text(question):
+    ''' return text with question content '''
+    text = '問題內容為：\n '+ question[2].encode('utf-8')
     return text
 
 def get_choice_question_rat_by_id(question_id):

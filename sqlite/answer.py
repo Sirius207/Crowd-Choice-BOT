@@ -9,13 +9,13 @@ conn = bot_config['sqlConn']
 cursor = conn.cursor()
 
 
-def save_choice_answer(chat_id, question_id, answer):
+def save_answer(chat_id, question_id, answer, question_type):
     '''save choice question to Sqlite'''
     time = datetime.datetime.now()
 
     sql = 'INSERT INTO QUESTION_ANSWER (QUESTION_ID, ANSWERER_ID , ANSWER, TYPE, CREATED_AT) \
         VALUES (?,?,?,?,?)'
-    cursor.execute(sql, [question_id, chat_id, answer, "choice", time])
+    cursor.execute(sql, [question_id, chat_id, answer, question_type, time])
     conn.commit()
 
 def save_choice_answer_rat(chat_id, question_id, answer):
