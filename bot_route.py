@@ -5,6 +5,7 @@ from sqlite.profile import (get_user_state_by_id, update_user_state_by_id)
 
 command = {
     '/start': machine.start,
+    '/help': machine.start,
     '/setup': machine.setup,
     '/info': machine.info,
     '/mute': machine.mute,

@@ -14,7 +14,16 @@ from send_message import (
     send_question, handle_answer, send_rat_question_warning
 )
 
-from redisDB.temp_question import *
+from redisDB.temp_question import (
+    save_temp_question, get_temp_question,
+    get_temp_question, remove_temp_question,
+    set_temp_options, save_temp_options,
+    get_temp_question_html, save_current_question_ID,
+    get_current_question_ID, reset_broadcast_question_ID,
+    reset_current_question_ID
+)
+
+from redisDB.temp_message import (plus_chat_count, reset_chat_count, get_chat_count)
 
 from sqlite.question import (
     save_question, get_new_choice_question, get_question_by_description,
@@ -38,6 +47,7 @@ GENDER_LIST = bot_config['gender_list']
 WELCOME_TEXT = bot_config['WELCOME_TEXT']
 HELP_TEXT = bot_config['HELP_TEXT']
 BAN_COUNT = bot_config['BAN_COUNT']
+CHAT_MESSAGE = bot_config['CHAT_MESSAGE']
 
 API_TOKEN = bot_config['API_TOKEN']
 bot = telegram.Bot(token=API_TOKEN)
@@ -84,7 +94,8 @@ class TocMachine(GraphMachine):
         if get_text(update) in GENDER_LIST:
             save_gender_profile(get_chat_id(update), get_text(update))
             text = "性別已設定為 " + get_text(update).encode('utf-8')
-            bot.send_message(get_chat_id(update), text)
+            reply_markup = telegram.ReplyKeyboardRemove()
+            bot.send_message(get_chat_id(update), text, reply_markup=reply_markup)
             return True
         else:
             text = "請直接點選底下的性別按鈕進行設定！"
@@ -163,8 +174,18 @@ class TocMachine(GraphMachine):
 
     def is_going_to_user(self, update):
         print ('check user')
-        return get_text(update).lower() != ('/question' or '/answer')
+        if int(get_chat_count(get_chat_id(update))) >= 2:
+            reset_chat_count(get_chat_id(update))
+            text = CHAT_MESSAGE
+            bot.send_message(get_chat_id(update), text)
+        else:
+            plus_chat_count(get_chat_id(update))
+            bot.send_message(
+                chat_id=get_chat_id(update),
+                text="請輸入/question 發問，或/answer 回答問題~~"
+            )
 
+        return get_text(update).lower() != ('/question' or '/answer')
 
     def is_valid_answer(self, update):
         if get_text(update) == 'answer-pass':
@@ -220,12 +241,6 @@ class TocMachine(GraphMachine):
 
     def on_enter_user(self, update):
         print (get_chat_id(update))
-        reply_markup = telegram.ReplyKeyboardRemove()
-        bot.send_message(
-            chat_id=get_chat_id(update),
-            text="請輸入/question 發問，或/answer 回答問題~~",
-            reply_markup=reply_markup
-        )
 
     def on_exit_user(self, update):
         print ('Leaving user')
