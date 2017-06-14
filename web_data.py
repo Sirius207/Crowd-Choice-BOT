@@ -7,6 +7,7 @@ from sqlite.answer import (
 )
 from sqlite.comment import (save_normal_answer_rat, get_normal_answer_rat_by_chat_id)
 from sqlite.profile import (update_user_rat_by_id)
+from send_message import (send_rat_answer_warning)
 
 from hash_check import check_hash
 
@@ -34,6 +35,9 @@ def rat_answer_by_id(chat_id, question_id, answer_id, reason):
         save_normal_answer_rat(chat_id, question_id, answer_id, reason)
         # plus rat count
         update_answer_rat_by_id(answer_id)
+
+        # warn the answerer
+        send_rat_answer_warning(answer_id, reason)
 
         # check rat count
         if get_choice_answer_rat_by_id(answer_id) >= BAN_COUNT:

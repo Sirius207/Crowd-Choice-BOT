@@ -36,6 +36,14 @@ def get_answers_by_id(question_id):
     answers = cursor.fetchall()
     return answers
 
+def get_answer_by_answer_id(answer_id):
+    ''' get question answer by answer_id'''
+    sql = 'SELECT * from QUESTION_ANSWER WHERE ANSWER_ID == ?'
+    cursor.execute(sql, [answer_id])
+    conn.commit()
+    answer = cursor.fetchone()
+    return answer
+
 def get_answers_by_answerer_id(question_id, chat_id):
     ''' get user's answer '''
     sql = 'SELECT  * from QUESTION_ANSWER WHERE QUESTION_ID == ? AND ANSWERER_ID = ?'

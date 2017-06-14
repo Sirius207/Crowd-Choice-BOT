@@ -13,13 +13,13 @@ from redisDB.temp_question import (
 
 from sqlite.question import (
     get_choice_question_text, get_normal_question_text, 
-    get_question_by_description
+    get_question_by_description, get_question_by_ID
 )
 
 
 from sqlite.answer import (
     save_answer, save_choice_answer_rat, get_choice_answer_statistics,
-    generate_answer_statistics_html, get_choice_answer
+    generate_answer_statistics_html, get_choice_answer, get_answer_by_answer_id
 )
 
 from sqlite.profile import (
@@ -179,3 +179,20 @@ def send_basic_answer_response(update, question):
     text = '目前金幣數為：' + \
         str(get_user_coin_by_id(get_chat_id(update))) + ' ~~'
     bot.send_message(get_chat_id(update), text)
+
+
+def send_rat_question_warning(question_id, reason):
+    ''' send warning to asker'''
+    question = get_question_by_ID(question_id)
+    text = '您先前提出的問題：' + question[2].encode('utf-8')
+    text += '\n因為 ' + reason.encode('utf-8') + ' 被檢舉囉~ 請注意~~'
+    bot.send_message(chat_id=question[1], text=text)
+
+
+def send_rat_answer_warning(answer_id, reason):
+    ''' send warning to answerer '''
+    answer = get_answer_by_answer_id(answer_id)
+    text = '您先前的回答：' + answer[3].encode('utf-8')
+    text += '\n因為 ' + reason.encode('utf-8') + ' 被檢舉囉~ 請注意~~'
+    bot.send_message(chat_id=answer[2], text=text)
+

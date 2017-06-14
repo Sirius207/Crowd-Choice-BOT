@@ -17,9 +17,11 @@
         {% for answer in question.answers %}
         <li id='answer-{{answer[0]}}'>
             <span>{{ answer[3]}}</span>
-            <button class="bonus">狂</button>
-            <button class="bonus">Good</button>
-            <button class="rat">檢舉</button>
+            {% if question.content[5] == 'normal'%}
+                <button class="bonus">狂</button>
+                <button class="bonus">Good</button>
+                <button class="rat">檢舉</button>
+            {% endif %}
         </li>
         {% endfor %}
     </ul>

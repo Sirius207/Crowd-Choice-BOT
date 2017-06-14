@@ -9,7 +9,10 @@ from telegram import InlineKeyboardButton, InlineKeyboardMarkup
 
 from get_message_info import (get_text, get_first_name, get_chat_id)
 
-from send_message import (build_menu, broadcast_question, send_question, handle_answer)
+from send_message import (
+    build_menu, broadcast_question, 
+    send_question, handle_answer, send_rat_question_warning
+)
 
 from redisDB.temp_question import *
 
@@ -372,10 +375,7 @@ class TocMachine(GraphMachine):
         update_question_rat_by_id(question_id)
 
         # notice origin asker
-        question = get_question_by_ID(question_id)
-        text = '您先前提出的問題：' + question[2].encode('utf-8')
-        text += '\n因為 ' + reason.encode('utf-8') + ' 被檢舉囉~ 請注意~~'
-        bot.send_message(chat_id=question[1], text=text)
+        send_rat_question_warning(question_id, reason)
 
         # ban user if needed
         if get_choice_question_rat_by_id(question_id) >= BAN_COUNT:
