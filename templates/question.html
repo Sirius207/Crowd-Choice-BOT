@@ -1,0 +1,18 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>分散式神奇海螺 - 回答結果</title>
+</head>
+<body>
+    <h1>問題為</h1>
+    <p>{{question.content[2]}}</p>
+    <ul>
+        {% for answer in question.answers %}
+            <li>{{ answer[3]}}</li>
+        {% endfor %}
+    </ul>
+</body>
+</html>

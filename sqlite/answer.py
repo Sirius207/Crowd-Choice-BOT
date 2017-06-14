@@ -28,6 +28,22 @@ def save_choice_answer_rat(chat_id, question_id, answer):
     conn.commit()
 
 
+def get_answers_by_id(question_id):
+    ''' get question answers list'''
+    sql = 'SELECT  * from QUESTION_ANSWER WHERE QUESTION_ID == ? And Type != "rat"'
+    cursor.execute(sql, [question_id])
+    conn.commit()
+    answers = cursor.fetchall()
+    return answers
+
+def get_answers_by_answerer_id(question_id, chat_id):
+    ''' get user's answer '''
+    sql = 'SELECT  * from QUESTION_ANSWER WHERE QUESTION_ID == ? AND ANSWERER_ID = ?'
+    cursor.execute(sql, [question_id, chat_id])
+    conn.commit()
+    answer = cursor.fetchall()
+    return answer
+
 def get_choice_answer(question_id):
     ''' get question answers list'''
     sql = 'SELECT  ANSWER from QUESTION_ANSWER WHERE QUESTION_ID == ? And Type != "rat"'
