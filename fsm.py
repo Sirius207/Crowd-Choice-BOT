@@ -34,7 +34,7 @@ AGE_LIST = bot_config['age_list']
 GENDER_LIST = bot_config['gender_list']
 WELCOME_TEXT = bot_config['WELCOME_TEXT']
 HELP_TEXT = bot_config['HELP_TEXT']
-BAN_COUNT = 3
+BAN_COUNT = bot_config['BAN_COUNT']
 
 API_TOKEN = bot_config['API_TOKEN']
 bot = telegram.Bot(token=API_TOKEN)

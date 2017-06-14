@@ -46,11 +46,19 @@ def get_answers_by_answerer_id(question_id, chat_id):
 
 def get_choice_answer(question_id):
     ''' get question answers list'''
-    sql = 'SELECT  ANSWER from QUESTION_ANSWER WHERE QUESTION_ID == ? And Type != "rat"'
+    sql = 'SELECT ANSWER from QUESTION_ANSWER WHERE QUESTION_ID == ? And RAT_COUNT < 3 And Type != "rat"'
     cursor.execute(sql, [question_id])
     conn.commit()
     answers = cursor.fetchall()
     return answers
+
+
+def get_choice_answer_rat_by_id(answer_id):
+    '''get answer rat count by answer ID'''
+    sql = 'SELECT RAT_COUNT FROM QUESTION_ANSWER WHERE ANSWER_ID = ?'
+    cursor.execute(sql, [answer_id])
+    rat_count = cursor.fetchall()
+    return rat_count[0]
 
 
 def get_choice_answer_statistics(question_id):
@@ -75,3 +83,16 @@ def generate_answer_statistics_html(question_id):
         text += option
 
     return text
+
+#
+# update answer rat
+#
+
+def update_answer_rat_by_id(answer_id):
+    ''' rat answer '''
+    sql = 'UPDATE QUESTION_ANSWER SET RAT_COUNT = RAT_COUNT + 1  WHERE ANSWERER_ID = ?'
+    cursor.execute(sql, [answer_id])
+    conn.commit()
+
+
+

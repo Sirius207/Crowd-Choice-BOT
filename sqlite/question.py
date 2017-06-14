@@ -49,7 +49,8 @@ def get_new_choice_question(chat_id, question_id):
             FROM CHOICE_QUESTION  C \
             WHERE \
                 C.ASKER_ID !=  ?\
-                AND C.QUESTION_ID > ?  \
+                AND C.QUESTION_ID > ?\
+                AND C.RAT_COUNT < 3\
 		        AND NOT EXISTS (\
                     SELECT * \
 			        FROM QUESTION_ANSWER  Q\

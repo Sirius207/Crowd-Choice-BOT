@@ -1,18 +1,56 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta http-equiv="X-UA-Compatible" content="ie=edge">
     <title>分散式神奇海螺 - 回答結果</title>
 </head>
+
 <body>
-    <h1>問題為</h1>
+    <h1>神奇海螺簡答題</h1>
+    <h2>問題為</h2>
     <p>{{question.content[2]}}</p>
-    <ul>
+    <h2>目前有以下回答</h2>
+    <ul class="answers_list">
         {% for answer in question.answers %}
-            <li>{{ answer[3]}}</li>
+        <li id='answer-{{answer[0]}}'>
+            <span>{{ answer[3]}}</span>
+            <button class="bonus">狂</button>
+            <button class="bonus">讚</button>
+            <button class="rat">檢舉</button>
+        </li>
         {% endfor %}
     </ul>
+    <script src="https://code.jquery.com/jquery-3.2.1.min.js" integrity="sha256-hwg4gsxgFZhOsEEamdOYGBf13FyQuiTwlAQgxVSNgt4="
+        crossorigin="anonymous"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/axios/0.16.2/axios.min.js"></script>
+    <script>
+        $.urlParam = function(name){
+	        const results = new RegExp('[\?&]' + name + '=([^&#]*)').exec(window.location.href);
+	        return results[1] || 0;
+        }
+        $(".answers_list").delegate(".rat", "click", function () {
+            const answer_id = $( this ).parent().attr('id').replace('answer-', '')
+            const chat_id = $.urlParam('user')
+            const hash_value = $.urlParam('hash')
+            const route = window.location.pathname
+            const reason = 'start'
+            axios.post(route, {
+                    chat_id: chat_id,
+                    answer_id: answer_id,
+                    hash_value: hash_value,
+                    reason: reason
+                })
+                .then(function (response) {
+                    console.log(response);
+                })
+                .catch(function (error) {
+                    console.log(error);
+                });
+        });
+    </script>
 </body>
+
 </html>

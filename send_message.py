@@ -5,6 +5,8 @@ import telegram
 from telegram import InlineKeyboardButton, InlineKeyboardMarkup
 from get_message_info import (get_text, get_first_name, get_chat_id)
 
+import hashlib
+
 from redisDB.temp_question import (
     save_broadcast_question_ID
 )
@@ -30,6 +32,7 @@ from config import bot_config
 API_TOKEN = bot_config['API_TOKEN']
 bot = telegram.Bot(token=API_TOKEN)
 INDEX_URL = bot_config['INDEX_URL']
+HASHKEY = bot_config['HASHKEY']
 
 def build_menu(buttons,
                n_cols,
@@ -54,8 +57,8 @@ def send_question(chat_id, question):
     ]
 
     # generate message
-    text = '您有一則新問題，'
-
+    text = '您有一則新問題，ID:'
+    text += question[0] + '\n'
     # check button list
     question_type = question[5]
     if question_type == 'choice':
@@ -110,7 +113,9 @@ def handle_normal_answer(update, question):
     send_basic_answer_response(update, question)
 
     # setup answer route
+    hash_value = str(get_chat_id(update)) + HASHKEY
     link = INDEX_URL + 'question/' + str(question[0]) + '?user=' + str(get_chat_id(update))
+    link += '&hash=' + hashlib.sha224(hash_value).hexdigest()
     # send answers link to answerer
     text = '現在可以從 <a href="'
     text += link
