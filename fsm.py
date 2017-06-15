@@ -5,7 +5,7 @@ from transitions.extensions import GraphMachine
 
 import telegram
 from telegram import InlineKeyboardButton, InlineKeyboardMarkup
-
+from random import randint
 
 from get_message_info import (get_text, get_first_name, get_chat_id)
 
@@ -20,7 +20,7 @@ from redisDB.temp_question import (
     set_temp_options, save_temp_options,
     get_temp_question_html, save_current_question_ID,
     get_current_question_ID, reset_broadcast_question_ID,
-    reset_current_question_ID
+    reset_current_question_ID, save_temp_question_type
 )
 
 from redisDB.temp_message import (plus_chat_count, reset_chat_count, get_chat_count)
@@ -174,16 +174,17 @@ class TocMachine(GraphMachine):
 
     def is_going_to_user(self, update):
         print ('check user')
-        if int(get_chat_count(get_chat_id(update))) >= 2:
-            reset_chat_count(get_chat_id(update))
-            text = CHAT_MESSAGE
-            bot.send_message(get_chat_id(update), text)
-        else:
-            plus_chat_count(get_chat_id(update))
-            bot.send_message(
-                chat_id=get_chat_id(update),
-                text="請輸入/question 發問，或/answer 回答問題~~"
-            )
+        # if int(get_chat_count(get_chat_id(update))) >= 2:
+        #     reset_chat_count(get_chat_id(update))
+        #     index = randint(0, len(CHAT_MESSAGE)-1)
+        #     text = CHAT_MESSAGE[index]
+        #     bot.send_message(get_chat_id(update), text)
+        # else:
+        #     plus_chat_count(get_chat_id(update))
+        bot.send_message(
+            chat_id=get_chat_id(update),
+            text="請輸入/question 發問，或/answer 回答問題~~"
+        )
 
         return get_text(update).lower() != ('/question' or '/answer')
 
@@ -334,7 +335,7 @@ class TocMachine(GraphMachine):
             remove_temp_question(get_chat_id(update))
 
             # set message
-            text = "收到，您的問題已送出～請靜候其他同學的回覆. . . . .\n 每五人回覆問題時會通知一次~"
+            text = "收到，您的問題已送出～請靜候其他同學的回覆. . . . .\n 有人(選擇題每五人)回覆問題時會通知一次~"
 
         elif update.callback_query.data == 'no':
             remove_temp_question(get_chat_id(update))

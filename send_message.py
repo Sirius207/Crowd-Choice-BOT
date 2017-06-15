@@ -126,7 +126,7 @@ def handle_normal_answer(update, question):
 
     asker_subscribe = get_user_by_id(question[1])[3]
     if asker_subscribe == 'On':
-        text = '您的問題： ' + question[2] + '\n' + text
+        text = '您的問題： ' + question[2].encode('utf-8') + '\n' + text
         bot.send_message(chat_id=question[1],
                          text=text,
                          parse_mode=telegram.ParseMode.HTML)
@@ -136,7 +136,10 @@ def handle_normal_answer(update, question):
 
 def handle_choice_answer(update, question):
     '''check answer & send response & send statistics'''
-    question_id = question[3]
+    question_id = question[0]
+    print question
+    print 'id'
+    print question_id
     # check answer is valid
     if get_text(update) not in question[3].split('\n'):
         text = "請直接點選底下的按鈕進行回答！"
